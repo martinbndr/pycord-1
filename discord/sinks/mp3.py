@@ -55,13 +55,17 @@ class MP3Sink(Sink):
             Formatting the audio failed.
         """
         if self.vc.recording:
-            raise MP3SinkError("Audio may only be formatted after recording is finished.")
+            raise MP3SinkError(
+                "Audio may only be formatted after recording is finished."
+            )
         args = [
             "ffmpeg",
             "-f",
             "s16le",
             "-ar",
             "48000",
+            "-loglevel",
+            "error",
             "-ac",
             "2",
             "-i",
@@ -80,7 +84,9 @@ class MP3Sink(Sink):
         except FileNotFoundError:
             raise MP3SinkError("ffmpeg was not found.") from None
         except subprocess.SubprocessError as exc:
-            raise MP3SinkError("Popen failed: {0.__class__.__name__}: {0}".format(exc)) from exc
+            raise MP3SinkError(
+                "Popen failed: {0.__class__.__name__}: {0}".format(exc)
+            ) from exc
 
         out = process.communicate(audio.file.read())[0]
         out = io.BytesIO(out)
